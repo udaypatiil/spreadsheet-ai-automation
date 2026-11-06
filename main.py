@@ -28,3 +28,20 @@ def get_spreadsheet_data():
     new_row = all_rows[last_row:]
     headers = all_rows[0]
     return all_rows, new_row,headers
+
+def summarise_with_ai(text):
+    system_prompt = """
+    you are a helpful assistant that summarizes spreadsheet data.
+    you will receive new rows that are were added to a Google spreadsheet.
+    Please provide a clear, concise summary of this data. 
+    """
+    model = init_chat_model(
+        model='gemini-3-flash-preview',
+        model_provider='google_genai',
+        api_key= os.getenv('GEMINI_API_KEY'))
+
+    message = [{'role': 'system', 'content': system_prompt},
+                {'role': 'user', 'content': f'here are the new rows from the spreadsheet.\n {text} '}]
+
+    response = model.invoke(message).text
+    return response
