@@ -18,3 +18,13 @@ RECIPIENT_EMAIL = os.getenv('RECIPIENT_EMAIL')
 SENDER_PASSWORD = os.getenv('SENDER_PASSWORD')
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
+
+def get_spreadsheet_data():
+    """Fetch spreadsheet data"""
+    service = build('sheets', 'v4', developerKey=GOOGLE_API_KEY)
+    all_rows = service.spreadsheets().values().get(spreadsheetId=SPREADSHEET_ID, range=SHEET_NAME).execute()['values']
+    with open('last_row.txt', 'r') as file:
+        last_row = int(file.read())
+    new_row = all_rows[last_row:]
+    headers = all_rows[0]
+    return all_rows, new_row,headers
