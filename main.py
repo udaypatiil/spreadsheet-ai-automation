@@ -45,3 +45,37 @@ def summarise_with_ai(text):
 
     response = model.invoke(message).text
     return response
+
+
+
+def send_email(subject, body):
+    """Send email with the summary"""
+    msg = MIMEMultipart()
+    msg['From'] = SENDER_EMAIL
+    msg['To'] = RECIPIENT_EMAIL
+    msg['Subject'] = subject
+    msg.attach(MIMEText(body, 'plain'))
+
+    server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+    server.starttls()
+    server.login(SENDER_EMAIL, SENDER_PASSWORD)
+    server.send_message(msg)
+    server.quit()
+    print(f"Email send successfully to {RECIPIENT_EMAIL}")
+
+all_rows, new_row, headers = get_spreadsheet_data()
+total_rows = len(all_rows)
+with open('last_row.txt', 'w') as file:
+    file.write(str(total_rows))
+
+message = f"Headers:{headers} \nNew row: {new_row}"
+print(message)
+summary = summarise_with_ai(message)
+
+body = f"Here is a today's  summary \n\n{summary} \n\nThank You"
+send_email(f"daily spreadsheet summary",body)
+
+
+print("ALL_ROWS", all_rows)
+print("NEW_ROW", new_row)
+print(summary)
